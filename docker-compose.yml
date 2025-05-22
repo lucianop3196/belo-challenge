@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  belo-postgres:
+    container_name: belo-postgres
+    image: postgres:15
+    environment:
+      POSTGRES_DB: belo
+      POSTGRES_USER: belo
+      POSTGRES_PASSWORD: mGkqCdtSy2z8E4tG7ary #TODO: ver de pasar a una variable de entorno
+      PGDATA: /data/postgres
+      TZ: "America/Argentina/Buenos_Aires"
+      PGTZ: "America/Argentina/Buenos_Aires"
+    volumes:
+      - belo-postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - common-network
+
+volumes:
+  belo-postgres:
+
+networks:
+  common-network:
+    driver: bridge
