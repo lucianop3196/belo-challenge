@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getAppVersion(): string {
+    const pjson = require('../package.json');
+
+    return `Version api ${pjson.version}`;
   }
 }
