@@ -14,21 +14,21 @@ export class Account {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number;
 
-    @ManyToOne(() => User, (user) => user.accounts)
+    @ManyToOne(() => User, (user) => user.accounts, { nullable: false })
     @JoinColumn({ name: 'usuario_id' })
     user: User;
 
-    @Column({ name: 'direccion' })
+    @Column({ name: 'direccion', nullable: false, unique: true })
     address: string;
 
-    @Column({ name: 'saldo' })
+    @Column({ name: 'saldo', nullable: false, default: 0 })
     balance: string;
 
-    @ManyToOne(() => AccountType)
+    @ManyToOne(() => AccountType, { nullable: false })
     @JoinColumn({ name: 'tipo_cuenta_id' })
     accountType: AccountType;
 
-    @ManyToOne(() => Currency)
+    @ManyToOne(() => Currency, { nullable: false })
     @JoinColumn({ name: 'moneda_id' })
     curency: Currency;
 }

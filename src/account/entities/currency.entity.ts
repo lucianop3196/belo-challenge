@@ -6,9 +6,9 @@ export class Currency {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column({ type: 'enum', enum: EnumCurrency, enumName: 'moneda_codigo_enum' })
+    @Column({ type: 'enum', enum: EnumCurrency, enumName: 'moneda_codigo_enum', nullable: false, unique: true })
     code: number;
 
-    @Column({ name: 'nombre' })
+    @Column({ name: 'nombre', nullable: true })
     name: number;
 }

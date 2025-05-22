@@ -7,14 +7,11 @@ export class User {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number;
 
-    @Column({ name: 'nombre' })
+    @Column({ name: 'nombre', nullable: false })
     name: string;
 
-    @Column({ name: 'email' })
+    @Column({ name: 'email', unique: true, nullable: false })
     email: string;
-
-    @Column({ name: 'saldo' })
-    balance: string;
 
     @OneToMany(() => Account, account => account.user)
     accounts: Account[]
