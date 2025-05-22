@@ -7,11 +7,12 @@ import { ApiKeyGuard } from './guards/api-key.guard';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-  }), UsersModule, DatabaseModule, TransactionsModule],
+  }), UsersModule, DatabaseModule, TransactionsModule, AccountModule],
   controllers: [AppController],
   providers: [AppService,  { provide: APP_GUARD, useClass: ApiKeyGuard },],
 })

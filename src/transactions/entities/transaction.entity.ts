@@ -1,16 +1,19 @@
 
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Account } from 'src/account/entities/account.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity({ name: 'transacciones' })
 export class Transaction {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @Column({ name: 'origen' })
-  origin: string;
+  @ManyToOne(() => Account)
+  @JoinColumn({ name: 'origen' })
+  originAccount: Account;
 
-  @Column({ name: 'destino' })
-  destination: string;
+  @ManyToOne(() => Account)
+  @JoinColumn({ name: 'destino' })
+  destinationAccount: Account;
 
   @Column({ name: 'monto' })
   amount: string;
