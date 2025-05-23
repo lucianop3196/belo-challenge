@@ -1,12 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTransactionDto, CreateTransactionResponse } from './dtos/create-transaction.dto';
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { DataSource, EntityManager, FindOneOptions, Repository } from 'typeorm';
 import { Transaction } from './entities/transaction.entity';
 import { AccountService } from 'src/account/account.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EnumTransactionState } from './types/transaction-state.enum';
 import Decimal from 'decimal.js';
 import { GetTransactionsDto } from './dtos/get-transaction.dto';
+import { NestedKeys } from 'src/types/nested-keys.type';
 
 @Injectable()
 export class TransactionsService {
@@ -18,14 +19,26 @@ export class TransactionsService {
     ) { }
 
     async findAll(transactionsDtoRequest: GetTransactionsDto) {
-        const { userId } = transactionsDtoRequest
-        await this.transactionRepository.find({
-            where: {
-                originAccount: { user: { id: +userId } },
-                destinationAccount: { user: { id: +userId } }
-            }
-        })
+        const { userId, page, limit } = transactionsDtoRequest
+        const transactionRelations: Array<NestedKeys<Transaction>> = ['originAccount.user', 'destinationAccount.user', 'originAccount', 'destinationAccount']
 
+        return await this.transactionRepository.find({
+            where: [
+                { originAccount: { user: { id: +userId } } },
+                { destinationAccount: { user: { id: +userId } } }
+            ],
+            take: limit,
+            skip: (page - 1) * limit,
+            relations: transactionRelations
+        })
+    }
+
+    async findOneOrFail(option?: FindOneOptions<Transaction>): Promise<Transaction> {
+        const tx = await this.transactionRepository.findOne(option)
+
+        if (!tx) throw new NotFoundException(`No existe la transaccion transacción solicitada`)
+
+        return tx
     }
 
     async create(createTransactionDto: CreateTransactionDto): Promise<Transaction> {
@@ -46,7 +59,7 @@ export class TransactionsService {
             const txCreated = await entityManagerTransaction.save(tx);
 
             if (amountNumber.lessThanOrEqualTo(50000)) {
-                return await this.executeTranction(txCreated.id, entityManagerTransaction)
+                return await this.executeTransaction(txCreated.id, entityManagerTransaction)
             }
 
             return txCreated
@@ -54,7 +67,13 @@ export class TransactionsService {
         })
     }
 
-    async executeTranction(idTransaction: number, entityManagerTransaction: EntityManager) {
+    async executeTransaction(idTransaction: number, entityManagerTransaction?: EntityManager): Promise<Transaction> {
+
+        if (!entityManagerTransaction) {
+            return this.dataSource.transaction(async manager =>
+                await this.executeTransaction(idTransaction, manager),
+            );
+        }
 
         const txRelations: Array<keyof Transaction> = ['originAccount', 'destinationAccount']
 
@@ -69,5 +88,13 @@ export class TransactionsService {
         tx.markAsConfirmed()
 
         return await entityManagerTransaction.save(Transaction, tx)
+    }
+
+    async approve(transactionId: number) {
+        const tx = await this.findOneOrFail({ where: { id: transactionId } })
+
+        if (!tx.canExecute()) throw new BadRequestException('No puedes ejecutar una transaccion con un estado distinto de Pendiente')
+
+        return await this.executeTransaction(transactionId)
     }
 }

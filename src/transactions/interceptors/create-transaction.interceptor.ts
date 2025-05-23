@@ -18,7 +18,7 @@ export class CreateTransactionInterceptor<T> implements NestInterceptor<T, Creat
     return next.handle().pipe(
       map((response: Transaction) => {
         return {
-          data: { transactionId: response.id, state: response.state },
+          data: { transactionId: response.id, state: response.state, amount: response.amount },
           success: true,
         };
       }),

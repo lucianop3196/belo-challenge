@@ -3,8 +3,8 @@ import { IsNumberString } from "class-validator";
 export class CommonDto {
 
     @IsNumberString()
-    page: string = "1"
+    page: number = 1
 
     @IsNumberString()
-    limit: string = "10"
+    limit: number = 10
 }

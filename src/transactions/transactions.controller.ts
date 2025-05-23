@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseInterceptors } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { ApiSecurity } from '@nestjs/swagger';
@@ -8,7 +8,7 @@ import { CreateTransactionInterceptor } from './interceptors/create-transaction.
 @ApiSecurity('x-api-key')
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
+  constructor(private readonly transactionsService: TransactionsService) { }
 
   @UseInterceptors(CreateTransactionInterceptor)
   @Post()
@@ -20,4 +20,11 @@ export class TransactionsController {
   async findAll(@Query() transactionsDtoRequest: GetTransactionsDto) {
     return await this.transactionsService.findAll(transactionsDtoRequest);
   }
+
+  @UseInterceptors(CreateTransactionInterceptor)
+  @Patch(':id/approve')
+  async approve(@Param('id') transactionId: number) {
+    return await this.transactionsService.approve(+transactionId);
+  }
+
 }

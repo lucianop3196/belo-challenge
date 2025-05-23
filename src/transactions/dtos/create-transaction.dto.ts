@@ -16,6 +16,7 @@ export class CreateTransactionResponse {
     success: boolean;
     data: {
         transactionId: number;
-        state: EnumTransactionState
+        state: EnumTransactionState,
+        amount: string,
     }
 }
