@@ -19,7 +19,7 @@ export class Transaction {
   @Column({ name: 'monto', nullable: false })
   amount: string;
 
-  @Column({ name: 'estado', default: EnumTransactionState.PENDIENTE, enum: EnumTransactionState, enumName: 'transaction_state_enum' })
+  @Column({ name: 'estado', default: EnumTransactionState.PENDING, enum: EnumTransactionState, enumName: 'transaction_state_enum' })
   state: EnumTransactionState;
 
   @CreateDateColumn({ name: 'fecha_alta' })

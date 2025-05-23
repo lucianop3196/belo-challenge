@@ -20,8 +20,11 @@ export class AccountService {
     }
 
     async adjustBalance(destinationAddress: string, originAddress: string, amount: string, entityManagerTransaction: EntityManager) {
-        const destinationAccount = await this.findOne(destinationAddress)
-        const originAccount = await this.findOne(originAddress)
+
+        const [destinationAccount, originAccount] = await Promise.all([
+            this.findOne(destinationAddress),
+            this.findOne(originAddress),
+        ]);
 
         const balanceDestinationAcc = new Decimal(destinationAccount.balance)
 

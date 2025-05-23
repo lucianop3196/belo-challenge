@@ -1,3 +1,3 @@
 export enum EnumCurrency {
-    ARS = 1,
+    ARS = 'ars',
 }

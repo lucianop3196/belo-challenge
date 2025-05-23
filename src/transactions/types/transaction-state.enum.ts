@@ -1,5 +1,5 @@
 export enum EnumTransactionState {
-    PENDIENTE = 1,
-    CONFIRMADA = 2,
-    RECHAZADA = 3,
+    PENDING = 'pending',
+    CONFIRMED = 'confirmed',
+    REJECTED = 'rejected',
 }
