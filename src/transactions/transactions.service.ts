@@ -21,7 +21,6 @@ export class TransactionsService {
         const destinationAccount = await this.accountService.findOne(destinationAddress)
         const originAccount = await this.accountService.findOne(originAddress)
 
-
         await this.dataSource.transaction(async (entityManagerTransaction) => {
             const tx = await entityManagerTransaction.save(Transaction, {
                 destinationAccount,

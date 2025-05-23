@@ -10,5 +10,5 @@ export class Currency {
     code: EnumCurrency;
 
     @Column({ name: 'nombre', nullable: true })
-    name: number;
+    name: string;
 }
