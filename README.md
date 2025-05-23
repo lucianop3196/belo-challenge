@@ -32,7 +32,7 @@ yarn install
 
 ### 2. Levantar la base de datos
 
-Asegurate de tener Docker y Docker Compose instalados. Luego ejecutá:
+Asegurate de tener Docker y Docker Compose instalados. Luego ejecutá en la raíz del proyecto:
 
 ```
 docker compose up -d
@@ -74,4 +74,9 @@ DB_PORT_TEST=5432
 DB_USERNAME_TEST="belo"
 DB_PASSWORD_TEST="mGkqCdtSy2z8E4tG7ary"
 DB_NAME_TEST="belo_test"
+```
+
+Para la ejecución de los test, ejecutar el siguiente commando:
+```
+yarn run test:e2e
 ```
