@@ -1,3 +1,3 @@
 export enum EnumAccountType {
-    VIRTUAL = 1,
+    VIRTUAL = 'virtual',
 }

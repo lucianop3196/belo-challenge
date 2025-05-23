@@ -11,5 +11,5 @@ export class AccountType {
     id: number;
 
     @Column({ type: 'enum', enum: EnumAccountType, enumName: 'tipo_cuenta_enum', nullable: false })
-    type: number;
+    type: string;
 }
