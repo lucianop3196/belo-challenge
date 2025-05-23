@@ -97,4 +97,12 @@ export class TransactionsService {
 
         return await this.executeTransaction(transactionId)
     }
+
+    async reject(transactionId: number) {
+        const tx = await this.findOneOrFail({ where: { id: transactionId } })
+
+        tx.markAsRejected()
+
+        return await this.transactionRepository.save(tx)
+    }
 }

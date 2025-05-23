@@ -27,4 +27,9 @@ export class TransactionsController {
     return await this.transactionsService.approve(+transactionId);
   }
 
+  @UseInterceptors(CreateTransactionInterceptor)
+  @Patch(':id/reject')
+  async reject(@Param('id') transactionId: number) {
+    return await this.transactionsService.reject(+transactionId);
+  }
 }

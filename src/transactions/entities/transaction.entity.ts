@@ -39,6 +39,9 @@ export class Transaction {
   }
 
   markAsRejected() {
+    if(this.state === EnumTransactionState.CONFIRMED) {
+      throw new BadRequestException('No se puede rechazar una transacción confirmada');
+    }
     this.state = EnumTransactionState.REJECTED;
   }
 
