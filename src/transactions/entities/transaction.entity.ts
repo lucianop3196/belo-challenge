@@ -20,7 +20,7 @@ export class Transaction {
   amount: string;
 
   @Column({ name: 'estado', default: EnumTransactionState.PENDIENTE, enum: EnumTransactionState, enumName: 'transaction_state_enum' })
-  state: boolean;
+  state: EnumTransactionState;
 
   @CreateDateColumn({ name: 'fecha_alta' })
   createdAt: Date

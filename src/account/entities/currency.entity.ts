@@ -7,7 +7,7 @@ export class Currency {
     id: number
 
     @Column({ type: 'enum', enum: EnumCurrency, enumName: 'moneda_codigo_enum', nullable: false, unique: true })
-    code: number;
+    code: EnumCurrency;
 
     @Column({ name: 'nombre', nullable: true })
     name: number;

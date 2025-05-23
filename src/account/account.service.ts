@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { EntityManager, Repository } from 'typeorm';
 import { Account } from './entities/account.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import Decimal from 'decimal.js';
 
 @Injectable()
 export class AccountService {
@@ -16,5 +17,25 @@ export class AccountService {
         if (!account) throw new NotFoundException(`La cuenta ${address} no existe`)
 
         return account
+    }
+
+    async adjustBalance(destinationAddress: string, originAddress: string, amount: string, entityManagerTransaction: EntityManager) {
+        const destinationAccount = await this.findOne(destinationAddress)
+        const originAccount = await this.findOne(originAddress)
+
+        const balanceDestinationAcc = new Decimal(destinationAccount.balance)
+
+        const balanceOrigintionAcc = new Decimal(originAccount.balance)
+
+        const amountNumber = new Decimal(amount)
+
+        const newDestinationBalance = balanceDestinationAcc.plus(amountNumber)
+        const newOriginBalance = balanceOrigintionAcc.minus(amountNumber)
+
+        if (newOriginBalance.isNegative()) throw new BadRequestException(`La direccion ${originAddress} no tiene suficiente saldo`)
+
+        await entityManagerTransaction.save(Account, [{ ...destinationAccount, balance: newDestinationBalance.toString() }, { ...originAccount, balance: newOriginBalance.toString() }])
+
+        return { success: true }
     }
 }
