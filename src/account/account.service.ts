@@ -26,18 +26,10 @@ export class AccountService {
             entityManagerTransaction.findOne(Account, { where: { address: originAddress }, lock: { mode: "pessimistic_write" } }),
         ]);
 
-        const balanceDestinationAcc = new Decimal(destinationAccount.balance)
+        originAccount.debit(amount);
+        destinationAccount.credit(amount);
 
-        const balanceOrigintionAcc = new Decimal(originAccount.balance)
-
-        const amountNumber = new Decimal(amount)
-
-        const newDestinationBalance = balanceDestinationAcc.plus(amountNumber)
-        const newOriginBalance = balanceOrigintionAcc.minus(amountNumber)
-
-        if (newOriginBalance.isNegative()) throw new BadRequestException(`La direccion ${originAddress} no tiene suficiente saldo`)
-
-        await entityManagerTransaction.save(Account, [{ ...destinationAccount, balance: newDestinationBalance.toString() }, { ...originAccount, balance: newOriginBalance.toString() }])
+        await entityManagerTransaction.save([originAccount, destinationAccount]);
 
         return { success: true }
     }

@@ -8,6 +8,8 @@ import {
 } from 'typeorm';
 import { AccountType } from './account-type.entity';
 import { Currency } from './currency.entity';
+import Decimal from 'decimal.js';
+import { BadRequestException } from '@nestjs/common';
 
 @Entity({ name: 'cuentas' })
 export class Account {
@@ -31,4 +33,21 @@ export class Account {
     @ManyToOne(() => Currency, { nullable: false })
     @JoinColumn({ name: 'moneda_id' })
     curency: Currency;
+
+    private get balanceDecimal(): Decimal {
+        return new Decimal(this.balance);
+    }
+
+    credit(amount: string) {
+        const result = this.balanceDecimal.plus(new Decimal(amount));
+        this.balance = result.toString();
+    }
+
+    debit(amount: string) {
+        const result = this.balanceDecimal.minus(new Decimal(amount));
+        if (result.isNegative()) {
+            throw new BadRequestException(`La cuenta ${this.address} no tiene saldo suficiente`);
+        }
+        this.balance = result.toString();
+    }
 }

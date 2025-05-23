@@ -41,18 +41,16 @@ export class TransactionsService {
         if (amountNumber.lessThanOrEqualTo(0)) throw new BadRequestException('El monto debe ser mayor a 0')
 
         return await this.dataSource.transaction(async (entityManagerTransaction) => {
-            const tx = await entityManagerTransaction.save(Transaction, {
-                destinationAccount,
-                originAccount,
-                amount,
-                state: EnumTransactionState.PENDING
-            })
+            const tx = Transaction.create(originAccount, destinationAccount, amount);
+
+            const txCreated = await entityManagerTransaction.save(tx);
 
             if (amountNumber.lessThanOrEqualTo(50000)) {
-                return await this.executeTranction(tx.id, entityManagerTransaction)
+                return await this.executeTranction(txCreated.id, entityManagerTransaction)
             }
 
-            return tx
+            return txCreated
+
         })
     }
 
@@ -63,11 +61,13 @@ export class TransactionsService {
         const tx = await entityManagerTransaction.findOne(Transaction, { where: { id: idTransaction }, relations: txRelations })
 
         if (!tx) throw new BadRequestException(`No existe una transacción con id ${idTransaction}`)
-        if (tx.state === EnumTransactionState.CONFIRMED || tx.state === EnumTransactionState.REJECTED)
+        if (!tx.canExecute())
             throw new BadRequestException('No puedes ejecutar una transaccion con un estado distinto de Pendiente')
 
         await this.accountService.adjustBalance(tx.destinationAccount.address, tx.originAccount.address, tx.amount, entityManagerTransaction)
 
-        return await entityManagerTransaction.save(Transaction, { ...tx, state: EnumTransactionState.CONFIRMED })
+        tx.markAsConfirmed()
+
+        return await entityManagerTransaction.save(Transaction, tx)
     }
 }
