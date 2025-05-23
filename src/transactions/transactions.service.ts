@@ -40,7 +40,7 @@ export class TransactionsService {
 
         if (amountNumber.lessThanOrEqualTo(0)) throw new BadRequestException('El monto debe ser mayor a 0')
 
-        const tx = await this.dataSource.transaction(async (entityManagerTransaction) => {
+        return await this.dataSource.transaction(async (entityManagerTransaction) => {
             const tx = await entityManagerTransaction.save(Transaction, {
                 destinationAccount,
                 originAccount,
@@ -49,13 +49,11 @@ export class TransactionsService {
             })
 
             if (amountNumber.lessThanOrEqualTo(50000)) {
-                await this.executeTranction(tx.id, entityManagerTransaction)
+                return await this.executeTranction(tx.id, entityManagerTransaction)
             }
 
             return tx
         })
-
-        return tx
     }
 
     async executeTranction(idTransaction: number, entityManagerTransaction: EntityManager) {
@@ -70,8 +68,6 @@ export class TransactionsService {
 
         await this.accountService.adjustBalance(tx.destinationAccount.address, tx.originAccount.address, tx.amount, entityManagerTransaction)
 
-        await entityManagerTransaction.save(Transaction, { ...tx, state: EnumTransactionState.CONFIRMED })
-
-        return { success: true }
+        return await entityManagerTransaction.save(Transaction, { ...tx, state: EnumTransactionState.CONFIRMED })
     }
 }

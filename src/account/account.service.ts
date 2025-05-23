@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, FindOneOptions, Repository } from 'typeorm';
 import { Account } from './entities/account.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import Decimal from 'decimal.js';
@@ -11,7 +11,7 @@ export class AccountService {
         private readonly accountRepository: Repository<Account>
     ) { }
 
-    async findOne(address: string) {
+    async findOne(address: string, options?: FindOneOptions<Account>): Promise<Account> {
         const account = await this.accountRepository.findOne({ where: { address } })
 
         if (!account) throw new NotFoundException(`La cuenta ${address} no existe`)
@@ -22,8 +22,8 @@ export class AccountService {
     async adjustBalance(destinationAddress: string, originAddress: string, amount: string, entityManagerTransaction: EntityManager) {
 
         const [destinationAccount, originAccount] = await Promise.all([
-            this.findOne(destinationAddress),
-            this.findOne(originAddress),
+            entityManagerTransaction.findOne(Account, { where: { address: destinationAddress }, lock: { mode: "pessimistic_write" } }),
+            entityManagerTransaction.findOne(Account, { where: { address: originAddress }, lock: { mode: "pessimistic_write" } }),
         ]);
 
         const balanceDestinationAcc = new Decimal(destinationAccount.balance)

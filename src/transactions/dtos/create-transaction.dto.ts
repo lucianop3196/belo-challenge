@@ -1,4 +1,5 @@
 import { IsNumberString, IsString } from "class-validator";
+import { EnumTransactionState } from "../types/transaction-state.enum";
 
 export class CreateTransactionDto {
     @IsString()
@@ -15,5 +16,6 @@ export class CreateTransactionResponse {
     success: boolean;
     data: {
         transactionId: number;
+        state: EnumTransactionState
     }
 }
