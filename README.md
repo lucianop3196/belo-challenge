@@ -67,4 +67,11 @@ DB_PORT=5432
 DB_USERNAME="belo"
 DB_PASSWORD="mGkqCdtSy2z8E4tG7ary"
 DB_NAME="belo"
+DB_SYNC="true" #TODO: Cuidado en produccion
+
+DB_HOST_TEST="localhost"
+DB_PORT_TEST=5432
+DB_USERNAME_TEST="belo"
+DB_PASSWORD_TEST="mGkqCdtSy2z8E4tG7ary"
+DB_NAME_TEST="belo_test"
 ```
